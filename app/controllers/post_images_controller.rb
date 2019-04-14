@@ -7,16 +7,23 @@ class PostImagesController < ApplicationController
 	def create
 		@post_image = PostImage.new(post_image_params)
 		@post_image.user_id = current_user.id
-		@post_image.save
-		redirect_to post_images_path
+		if @post_image.save
+			redirect_to post_images_path
+		else
+			#「render」アクション名で、同じコントローラ内の別のアクションのviewを表示することができる
+			#ほかのコントローラのviewを呼び出すこともできるらしい
+			#redirect_toとの違いは、HTTPリクエストを送らず、viewを呼び出す
+			render :new
+		end
 	end
 
 	def index
-		@post_images = PostImage.all
+		@post_images = PostImage.page(params[:page]).reverse_order
 	end
 
 	def show
 		@post_image = PostImage.find(params[:id])
+		@post_comment = PostComment.new
 	end
 
 	private
